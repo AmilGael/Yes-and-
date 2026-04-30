@@ -648,7 +648,10 @@
   <section class="interview-screen" id="interviewScreen" aria-label="Interview session">
     <div role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-label="Interview progress" id="progressRegion">
       <div class="progress-meta">
-        <span class="progress-label" aria-hidden="true">Interview in progress</span>
+        <div>
+          <span class="progress-label" aria-hidden="true">Interview in progress</span>
+          <button id="soundBtn" onclick="toggleSound()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--blue);margin-left:12px;font-weight:600;" aria-label="Toggle sound">🔊 Sound On</button>
+        </div>
         <span class="progress-count" id="progressCount" aria-live="polite">Question 1 of 5</span>
       </div>
       <div class="progress-track" aria-hidden="true">
@@ -713,6 +716,32 @@
 </footer>
 
 <script>
+  let soundEnabled = true;
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('soundBtn');
+    if (soundEnabled) {
+      btn.innerHTML = '🔊 Sound On';
+      btn.style.color = 'var(--blue)';
+    } else {
+      btn.innerHTML = '🔇 Sound Off';
+      btn.style.color = 'var(--dim)';
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  }
+
+  function speakText(text) {
+    if (!soundEnabled || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    let preferredVoice = voices.find(v => v.name.includes('Google UK English Female') || v.name.includes('Google US English') || v.name.includes('Samantha') || v.name.includes('Daniel'));
+    if (!preferredVoice) preferredVoice = voices.find(v => v.lang.startsWith('en-'));
+    if (preferredVoice) utterance.voice = preferredVoice;
+    window.speechSynthesis.speak(utterance);
+  }
+  if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+
   let userName = '';
   let userRole = '';
   let userStory = [];
@@ -766,6 +795,8 @@ Return ONLY a JSON array of 5 strings. No markdown. No preamble.`;
     document.getElementById('progressFill').style.width = pct + '%';
     document.getElementById('questionText').textContent = questions[index];
     document.getElementById('feedbackCard').classList.remove('show');
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    setTimeout(() => speakText(questions[index]), 300);
     document.getElementById('answerInput').value = '';
     document.getElementById('answerInput').disabled = false;
     document.getElementById('submitBtn').style.display = 'inline-block';
@@ -815,6 +846,8 @@ Return ONLY this JSON (no markdown, no backticks):
 
   function showFeedback(fb) {
     document.getElementById('feedbackText').textContent = fb.summary;
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    setTimeout(() => speakText("Coach Feedback: " + fb.summary), 300);
     const scoreColor = fb.score >= 8 ? 'dot-green' : fb.score >= 5 ? 'dot-gold' : 'dot-red';
     document.getElementById('fbScore').innerHTML = `
       <div class="score-chip"><div class="score-dot dot-green"></div>${fb.strength}</div>
@@ -831,6 +864,7 @@ Return ONLY this JSON (no markdown, no backticks):
   }
 
   function skipQuestion() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
     answers.push({ q: questions[currentQ], a: '[skipped]' });
     feedbacks.push({ summary: 'Skipped.', strength: 'Knew when to move on', improve: 'Come back to this one', score: 0 });
     currentQ >= questions.length - 1 ? showResults() : showQuestion(currentQ + 1);
@@ -872,12 +906,18 @@ Remind them their path is a strength not a liability. No JSON. Just the note.`;
     try {
       const note = await callClaude('You are a mentor. Write warmly and directly.', [{ role: 'user', content: notePrompt }], 200);
       document.getElementById('coachNoteText').textContent = note;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      setTimeout(() => speakText(note), 300);
     } catch {
-      document.getElementById('coachNoteText').textContent = `${userName}, you showed up and did the work. That's the whole game. Every rep builds the confidence the room is looking for. Keep going.`;
+      const fallbackNote = `${userName}, you showed up and did the work. That's the whole game. Every rep builds the confidence the room is looking for. Keep going.`;
+      document.getElementById('coachNoteText').textContent = fallbackNote;
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      setTimeout(() => speakText(fallbackNote), 300);
     }
   }
 
   function resetAll() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
     questions = []; answers = []; feedbacks = []; currentQ = 0;
     document.getElementById('resultsScreen').classList.remove('active');
     document.getElementById('setupScreen').style.display = 'block';
