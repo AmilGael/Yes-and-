@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yes, And | AI Interview Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F3F2EF;
+    --ink: #000000E6;
+    --blue: #0A66C2;
+    --blue-hover: #004182;
+    --blue-light: #EAF0F8;
+    --red: #B24020;
+    --cream: #FFFFFF;
+    --paper: #FFFFFF;
+    --dim: #666666;
+    --border: #E0DFDC;
+    --green: #057642;
+    --nav: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Sans 3', -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  header {
+    background: var(--nav);
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+  }
+
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .logo em { color: var(--ink); font-style: normal; }
+
+  .tagline {
+    font-size: 12px;
+    color: var(--dim);
+    margin-top: 0;
+    display: none;
+  }
+
+  .round-badge {
+    display: inline-block;
+    background: var(--blue);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 100px;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* API */
+  .api-section {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0;
+    animation: fadeUp 0.4s ease;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+
+  .api-section h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .api-section p {
+    font-size: 14px;
+    color: var(--dim);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .api-row { display: flex; gap: 8px; }
+
+  .api-input {
+    flex: 1;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    border-radius: 4px;
+    transition: border-color 0.15s;
+  }
+
+  .api-input:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    border-radius: 24px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: var(--blue-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .error-msg { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* SETUP */
+  .setup-screen {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0;
+    animation: fadeUp 0.4s ease;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+
+  .setup-screen h2 {
+    font-size: clamp(20px, 3vw, 26px);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .setup-screen h2 em { color: var(--blue); font-style: normal; }
+
+  .setup-sub {
+    font-size: 14px;
+    color: var(--dim);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 500px;
+  }
+
+  .setup-fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+
+  .field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .field-input, .field-select {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+
+  .field-input:focus, .field-select:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+  .field-input::placeholder { color: #999; }
+
+  .field-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+  }
+
+  .story-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+  .story-pill {
+    background: transparent;
+    border: 1px solid var(--blue);
+    color: var(--blue);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .story-pill:hover, .story-pill.active {
+    background: var(--blue-light);
+    border-color: var(--blue);
+    color: var(--blue);
+    font-weight: 600;
+  }
+
+  /* INTERVIEW */
+  .interview-screen {
+    padding: 20px 0;
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .interview-screen.active { display: flex; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .progress-label, .progress-count {
+    font-size: 12px;
+    color: var(--dim);
+    font-weight: 500;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .question-card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    animation: fadeUp 0.35s ease;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+
+  .q-meta {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .q-text {
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .feedback-card {
+    background: #F0FAF4;
+    border: 1px solid #C9E8D5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeUp 0.35s ease;
+  }
+
+  .feedback-card.show { display: block; }
+
+  .fb-meta {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .fb-text { font-size: 14px; line-height: 1.7; color: var(--ink); }
+
+  .fb-score { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+  .score-chip {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--dim);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .score-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-green { background: var(--green); }
+  .dot-gold { background: #F5A623; }
+  .dot-red { background: var(--red); }
+
+  .answer-area { display: flex; flex-direction: column; gap: 10px; }
+
+  .answer-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    border-radius: 4px;
+    line-height: 1.6;
+    min-height: 110px;
+    transition: all 0.15s;
+  }
+
+  textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+  textarea::placeholder { color: #999; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--dim);
+    color: var(--dim);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 18px;
+    cursor: pointer;
+    border-radius: 24px;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+
+  .loading-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    color: var(--dim);
+    font-size: 13px;
+  }
+
+  .dots span {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--blue);
+    border-radius: 50%;
+    margin-right: 3px;
+    animation: blink 1.2s infinite;
+  }
+
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.7); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  /* RESULTS */
+  .results-screen {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0 40px;
+    display: none;
+    animation: fadeUp 0.5s ease;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+
+  .results-screen.active { display: block; }
+
+  .results-screen h2 {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .results-screen h2 em { color: var(--blue); font-style: normal; }
+
+  .overall-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--blue);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .score-num {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .score-meta { font-size: 12px; font-weight: 500; opacity: 0.85; }
+
+  .coach-note {
+    background: var(--blue-light);
+    border: 1px solid #C0D8F0;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+
+  .coach-note-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .coach-note-text {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .result-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+  .result-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .result-q {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .result-feedback { font-size: 13px; color: var(--dim); line-height: 1.7; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--nav);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  .footer-left { font-size: 12px; color: var(--dim); }
+  .footer-right { font-size: 12px; color: var(--dim); font-style: italic; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hidden { display: none !important; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skip-link {
+    position: absolute;
+    top: -100px;
+    left: 16px;
+    background: var(--blue);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    z-index: 9999;
+    transition: top 0.1s;
+  }
+
+  .skip-link:focus { top: 8px; }
+
+  /* MIC BUTTON */
+  .mic-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .btn-mic {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--paper);
+    color: var(--dim);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .btn-mic:hover { border-color: var(--blue); color: var(--blue); }
+
+  .btn-mic.listening {
+    border-color: var(--red);
+    background: var(--red);
+    color: #fff;
+    animation: micPulse 1s infinite;
+  }
+
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(178,64,32,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(178,64,32,0); }
+  }
+
+  .mic-status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+
+  .mic-status.active { color: var(--red); }
+</style>
+</head>
+<body>
+
+<header role="banner">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="34" height="34" fill="#0A66C2" aria-hidden="true" focusable="false"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    <div class="logo" role="heading" aria-level="1">Yes, <em>And</em></div>
+  </div>
+  <span class="round-badge" aria-label="Tagline: Play to Prepare">Play to Prepare</span>
+</header>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<div class="main" id="main-content" role="main">
+
+  <!-- SETUP -->
+  <section class="setup-screen" id="setupScreen" aria-labelledby="setupHeading">
+    <h2 id="setupHeading">Your story is your <em>greatest</em> asset.</h2>
+    <p class="setup-sub">This is a safe space to practice. The AI will ask you real interview questions and coach you on how to tell your story with confidence. No judgment. Just reps.</p>
+
+    <div class="setup-fields">
+      <div>
+        <label class="field-label" for="nameInput">Your first name</label>
+        <input type="text" class="field-input" id="nameInput" placeholder="What should we call you?" autocomplete="given-name" />
+      </div>
+      <div>
+        <label class="field-label" for="roleSelect">What role are you going for?</label>
+        <select class="field-select" id="roleSelect" aria-required="true">
+          <option>Software Engineer</option>
+          <option>Frontend Developer</option>
+          <option>Product Manager</option>
+          <option>Data Analyst</option>
+          <option>QA Engineer</option>
+          <option>DevOps / Cloud Engineer</option>
+          <option>Technical Program Manager</option>
+        </select>
+      </div>
+      <div>
+        <fieldset style="border:none;padding:0;margin:0;">
+          <legend class="field-label">What's your story? Pick what fits.</legend>
+          <div class="story-pills" role="group" aria-label="Background tags">
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">First gen college grad</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">Career changer</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">Bootcamp / self-taught</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">Immigrant or child of immigrants</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">Single parent</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">No traditional network</button>
+            <button class="story-pill" onclick="togglePill(this)" aria-pressed="false">Worked full-time while studying</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startInterview()">Start My Session</button>
+  </section>
+
+  <!-- INTERVIEW -->
+  <section class="interview-screen" id="interviewScreen" aria-label="Interview session">
+    <div role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-label="Interview progress" id="progressRegion">
+      <div class="progress-meta">
+        <span class="progress-label" aria-hidden="true">Interview in progress</span>
+        <span class="progress-count" id="progressCount" aria-live="polite">Question 1 of 5</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard" aria-live="polite" aria-atomic="true">
+      <div class="q-meta" aria-hidden="true">&#127919; Interviewer</div>
+      <div class="q-text" id="questionText" role="heading" aria-level="2">Loading your first question...</div>
+    </div>
+
+    <div class="feedback-card" id="feedbackCard" aria-live="polite" aria-atomic="true" role="region" aria-label="Coach feedback">
+      <div class="fb-meta" aria-hidden="true">Coach Feedback</div>
+      <div class="fb-text" id="feedbackText"></div>
+      <div class="fb-score" id="fbScore"></div>
+    </div>
+
+    <div class="loading-row hidden" id="loadingRow" role="status" aria-live="polite" aria-label="AI is thinking">
+      <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span>Thinking...</span>
+    </div>
+
+    <div class="answer-area" id="answerArea">
+      <div class="mic-row">
+        <button class="btn-mic" id="micBtn" onclick="toggleMic()" aria-label="Start voice input" aria-pressed="false">🎙️</button>
+        <span class="mic-status" id="micStatus" aria-live="polite" aria-atomic="true">Tap mic to speak</span>
+      </div>
+      <label class="answer-label" for="answerInput">Your answer</label>
+      <textarea id="answerInput" placeholder="Speak or type your answer..." rows="5" onkeydown="handleKey(event)" aria-describedby="answerHint"></textarea>
+      <span id="answerHint" class="sr-only">Press Command Enter to submit your answer</span>
+      <div class="btn-row" role="group" aria-label="Answer controls">
+        <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+        <button class="btn-secondary" id="skipBtn" onclick="skipQuestion()">Skip This One</button>
+        <button class="btn-secondary" id="nextBtn" onclick="nextQuestion()" style="display:none">Next Question &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results-screen" id="resultsScreen" aria-labelledby="resultsHeading" aria-live="polite">
+    <h2 id="resultsHeading">You showed <em>up.</em></h2>
+    <div class="overall-score" role="status" aria-label="Overall readiness score">
+      <div>
+        <div class="score-meta">Overall Readiness</div>
+        <div class="score-num" id="scoreNum">--</div>
+      </div>
+    </div>
+    <div class="coach-note" role="region" aria-label="Coach's closing note">
+      <div class="coach-note-label" aria-hidden="true">A note from your coach</div>
+      <div class="coach-note-text" id="coachNoteText">Generating your summary...</div>
+    </div>
+    <div class="result-items" id="resultItems" role="list" aria-label="Question by question feedback"></div>
+    <button class="btn-primary" onclick="resetAll()">Practice Again</button>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-left">Yes, And &mdash; Hackathon Demo &mdash; Built with Pursuit</div>
+  <div class="footer-right">"The room was built for someone else. Walk in anyway."</div>
+</footer>
+
+<script>
+  let userName = '';
+  let userRole = '';
+  let userStory = [];
+  let questions = [];
+  let answers = [];
+  let feedbacks = [];
+  let currentQ = 0;
+  const TOTAL_Q = 5;
+
+  function togglePill(el) {
+    el.classList.toggle('active');
+    el.setAttribute('aria-pressed', el.classList.contains('active') ? 'true' : 'false');
+  }
+
+  async function startInterview() {
+    userName = document.getElementById('nameInput').value.trim() || 'You';
+    userRole = document.getElementById('roleSelect').value;
+    userStory = Array.from(document.querySelectorAll('.story-pill.active')).map(p => p.textContent);
+
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('interviewScreen').classList.add('active');
+
+    await generateQuestions();
+    showQuestion(0);
+  }
+
+  async function generateQuestions() {
+    const storyCtx = userStory.length > 0 ? `Candidate background: ${userStory.join(', ')}.` : 'Non-traditional tech candidate.';
+    const prompt = `Generate 5 interview questions for a ${userRole} role. ${storyCtx}
+Mix: 1 opener (tell me about yourself), 2 behavioral (STAR), 1 conceptual technical, 1 motivation question.
+Return ONLY a JSON array of 5 strings. No markdown. No preamble.`;
+
+    try {
+      const res = await callClaude('Return only valid JSON arrays.', [{ role: 'user', content: prompt }], 600);
+      questions = JSON.parse(res.replace(/```json|```/g, '').trim());
+    } catch {
+      questions = [
+        `Tell me about yourself and what brought you to a career in ${userRole}.`,
+        "Describe a time you had to learn something completely new under pressure. How did you handle it?",
+        "Tell me about a project you're proud of. What was your role and what did you learn?",
+        "How do you stay current with new tools and the tech industry?",
+        "Why do you want to work in tech, and why should we bet on you?"
+      ];
+    }
+  }
+
+  function showQuestion(index) {
+    currentQ = index;
+    const pct = (index / questions.length) * 100;
+    document.getElementById('progressCount').textContent = `Question ${index + 1} of ${questions.length}`;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('questionText').textContent = questions[index];
+    document.getElementById('feedbackCard').classList.remove('show');
+    document.getElementById('answerInput').value = '';
+    document.getElementById('answerInput').disabled = false;
+    document.getElementById('submitBtn').style.display = 'inline-block';
+    document.getElementById('skipBtn').style.display = 'inline-block';
+    document.getElementById('nextBtn').style.display = 'none';
+
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'fadeUp 0.35s ease';
+
+    document.getElementById('answerInput').focus();
+  }
+
+  async function submitAnswer() {
+    const answer = document.getElementById('answerInput').value.trim();
+    if (!answer) return;
+
+    answers.push({ q: questions[currentQ], a: answer });
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('skipBtn').style.display = 'none';
+    document.getElementById('answerInput').disabled = true;
+    document.getElementById('loadingRow').classList.remove('hidden');
+
+    const storyCtx = userStory.length > 0 ? `Their background: ${userStory.join(', ')}.` : '';
+    const prompt = `You are a warm, honest interview coach helping ${userName} prepare for a ${userRole} role. ${storyCtx}
+
+Question: "${questions[currentQ]}"
+Answer: "${answer}"
+
+Return ONLY this JSON (no markdown, no backticks):
+{"summary":"2-3 sentences of specific feedback referencing their actual words","strength":"one strong thing in 8 words max","improve":"one thing to sharpen in 8 words max","score":7}`;
+
+    try {
+      const res = await callClaude('You are a coach. Return only valid JSON.', [{ role: 'user', content: prompt }], 400);
+      const fb = JSON.parse(res.replace(/```json|```/g, '').trim());
+      feedbacks.push(fb);
+      showFeedback(fb);
+    } catch {
+      const fb = { summary: "Good effort. Keep building on your real experiences.", strength: "Answered with honesty", improve: "Add more concrete examples", score: 6 };
+      feedbacks.push(fb);
+      showFeedback(fb);
+    }
+
+    document.getElementById('loadingRow').classList.add('hidden');
+  }
+
+  function showFeedback(fb) {
+    document.getElementById('feedbackText').textContent = fb.summary;
+    const scoreColor = fb.score >= 8 ? 'dot-green' : fb.score >= 5 ? 'dot-gold' : 'dot-red';
+    document.getElementById('fbScore').innerHTML = `
+      <div class="score-chip"><div class="score-dot dot-green"></div>${fb.strength}</div>
+      <div class="score-chip"><div class="score-dot dot-gold"></div>Work on: ${fb.improve}</div>
+      <div class="score-chip"><div class="score-dot ${scoreColor}"></div>Score: ${fb.score}/10</div>
+    `;
+    document.getElementById('feedbackCard').classList.add('show');
+
+    const isLast = currentQ >= questions.length - 1;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.style.display = 'inline-block';
+    nextBtn.textContent = isLast ? 'See My Results \u2192' : 'Next Question \u2192';
+    nextBtn.onclick = isLast ? showResults : () => showQuestion(currentQ + 1);
+  }
+
+  function skipQuestion() {
+    answers.push({ q: questions[currentQ], a: '[skipped]' });
+    feedbacks.push({ summary: 'Skipped.', strength: 'Knew when to move on', improve: 'Come back to this one', score: 0 });
+    currentQ >= questions.length - 1 ? showResults() : showQuestion(currentQ + 1);
+  }
+
+  // expose for onclick
+  function nextQuestion() { showQuestion(currentQ + 1); }
+
+  async function showResults() {
+    document.getElementById('interviewScreen').classList.remove('active');
+    document.getElementById('resultsScreen').classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+
+    const answered = feedbacks.filter(f => f.score > 0);
+    const avg = answered.length > 0
+      ? Math.round(answered.reduce((s, f) => s + f.score, 0) / answered.length * 10)
+      : 0;
+    document.getElementById('scoreNum').textContent = avg + '%';
+
+    const container = document.getElementById('resultItems');
+    container.innerHTML = '';
+    answers.forEach((a, i) => {
+      if (a.a === '[skipped]') return;
+      const fb = feedbacks[i];
+      const div = document.createElement('div');
+      div.className = 'result-item';
+      div.innerHTML = `<div class="result-q">${a.q}</div><div class="result-feedback">${fb.summary}</div>`;
+      container.appendChild(div);
+    });
+
+    const allFb = feedbacks.map((f, i) => `Q${i+1}: ${f.summary}`).join(' ');
+    const notePrompt = `You coached ${userName} through a mock ${userRole} interview.
+Background: ${userStory.join(', ') || 'non-traditional candidate'}.
+Performance: ${allFb}
+
+Write a closing note: 3 sentences max. Warm. Honest. Personal. Reference their specific background.
+Remind them their path is a strength not a liability. No JSON. Just the note.`;
+
+    try {
+      const note = await callClaude('You are a mentor. Write warmly and directly.', [{ role: 'user', content: notePrompt }], 200);
+      document.getElementById('coachNoteText').textContent = note;
+    } catch {
+      document.getElementById('coachNoteText').textContent = `${userName}, you showed up and did the work. That's the whole game. Every rep builds the confidence the room is looking for. Keep going.`;
+    }
+  }
+
+  function resetAll() {
+    questions = []; answers = []; feedbacks = []; currentQ = 0;
+    document.getElementById('resultsScreen').classList.remove('active');
+    document.getElementById('setupScreen').style.display = 'block';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('nameInput').value = '';
+    document.querySelectorAll('.story-pill').forEach(p => p.classList.remove('active'));
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && e.metaKey) submitAnswer();
+  }
+
+  // ---- VOICE ----
+  let recog = null;
+  let isListening = false;
+  let voiceBase = '';
+
+  function toggleMic() {
+    const btn = document.getElementById('micBtn');
+    const status = document.getElementById('micStatus');
+
+    // Step 1: check protocol — file:// blocks mic in Chrome
+    if (location.protocol === 'file:') {
+      status.textContent = 'Open via server or GitHub Pages — file:// blocks mic';
+      btn.style.borderColor = 'var(--red)';
+      return;
+    }
+
+    // Step 2: check API support
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      status.textContent = 'Speech API not found — try Chrome';
+      return;
+    }
+
+    // Step 3: if listening, stop
+    if (isListening) {
+      isListening = false;
+      if (recog) { try { recog.abort(); } catch(e) {} recog = null; }
+      btn.classList.remove('listening');
+      btn.textContent = '🎙️';
+      btn.setAttribute('aria-label', 'Start voice input');
+      btn.setAttribute('aria-pressed', 'false');
+      status.textContent = 'Tap mic to speak';
+      status.classList.remove('active');
+      return;
+    }
+
+    // Step 4: request mic permission explicitly first
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        // Permission granted — start recognition
+        voiceBase = document.getElementById('answerInput').value.trim();
+        if (voiceBase) voiceBase += ' ';
+
+        recog = new SR();
+        recog.continuous = true;
+        recog.interimResults = true;
+        recog.lang = 'en-US';
+        recog.maxAlternatives = 1;
+
+        recog.onstart = () => {
+          isListening = true;
+          btn.classList.add('listening');
+          btn.textContent = '⏹';
+          status.textContent = 'Listening... tap to stop';
+          status.classList.add('active');
+        };
+
+        recog.onresult = (e) => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) voiceBase += t + ' ';
+            else interim = t;
+          }
+          document.getElementById('answerInput').value = voiceBase + interim;
+        };
+
+        recog.onerror = (e) => {
+          console.error('SpeechRecognition error:', e.error, e.message);
+          isListening = false;
+          btn.classList.remove('listening');
+          btn.textContent = '🎙️';
+          status.classList.remove('active');
+          const msgs = {
+            'not-allowed': 'Mic denied — allow mic in Chrome address bar',
+            'no-speech': 'No speech heard — tap mic and try again',
+            'network': 'Network error — check connection',
+            'audio-capture': 'No mic found — check your device',
+            'aborted': 'Tap mic to speak'
+          };
+          status.textContent = msgs[e.error] || 'Error: ' + e.error + ' — try again';
+        };
+
+        recog.onend = () => {
+          // Auto-restart if user hasn't manually stopped
+          if (isListening) {
+            try { recog.start(); } catch(e) {
+              isListening = false;
+              btn.classList.remove('listening');
+              btn.textContent = '🎙️';
+              status.textContent = 'Tap mic to speak';
+              status.classList.remove('active');
+            }
+          }
+        };
+
+        recog.start();
+      })
+      .catch((err) => {
+        console.error('getUserMedia error:', err);
+        status.textContent = 'Mic access denied — click the lock icon in Chrome address bar';
+        btn.style.borderColor = 'var(--red)';
+      });
+  }
+
+  async function callClaude(system, msgs, maxTokens = 400) {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        system,
+        messages: msgs
+      })
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'API error'); }
+    const data = await res.json();
+    return data.content[0].text;
+  }
+</script>
+</body>
+</html>
