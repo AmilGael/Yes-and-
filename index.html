@@ -48,14 +48,20 @@
   }
 
   .logo {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--blue);
-    letter-spacing: -0.5px;
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--blue) 0%, #0099ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.8px;
     line-height: 1;
   }
 
-  .logo em { color: var(--ink); font-style: normal; }
+  .logo em { 
+    color: var(--ink); 
+    font-style: normal; 
+    -webkit-text-fill-color: var(--ink);
+  }
 
   .tagline {
     font-size: 12px;
@@ -593,7 +599,6 @@
 
 <header role="banner">
   <div style="display:flex;align-items:center;gap:8px;">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="34" height="34" fill="#0A66C2" aria-hidden="true" focusable="false"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     <div class="logo" role="heading" aria-level="1">Yes, <em>And</em></div>
   </div>
   <span class="round-badge" aria-label="Tagline: Play to Prepare">Play to Prepare</span>
@@ -771,18 +776,18 @@
   async function generateQuestions() {
     const storyCtx = userStory.length > 0 ? `Candidate background: ${userStory.join(', ')}.` : 'Non-traditional tech candidate.';
     const prompt = `Generate 5 interview questions for a ${userRole} role. ${storyCtx}
-Mix: 1 opener (tell me about yourself), 2 behavioral (STAR), 1 conceptual technical, 1 motivation question.
-Return ONLY a JSON array of 5 strings. No markdown. No preamble.`;
+Mix: 1 fun/unconventional icebreaker, 2 behavioral (STAR), 1 wild-card creative problem-solving question, 1 motivation question.
+Make them conversational and slightly unexpected. Return ONLY a JSON array of 5 strings. No markdown. No preamble.`;
 
     try {
       const res = await callClaude('Return only valid JSON arrays.', [{ role: 'user', content: prompt }], 600);
       questions = JSON.parse(res.replace(/```json|```/g, '').trim());
     } catch {
       questions = [
-        `Tell me about yourself and what brought you to a career in ${userRole}.`,
+        `If your career was a movie genre, what would it be and why?`,
         "Describe a time you had to learn something completely new under pressure. How did you handle it?",
-        "Tell me about a project you're proud of. What was your role and what did you learn?",
-        "How do you stay current with new tools and the tech industry?",
+        "What's a weird hobby or interest you have that actually makes you better at your job?",
+        "Teach me something complex in 60 seconds or less.",
         "Why do you want to work in tech, and why should we bet on you?"
       ];
     }
@@ -822,13 +827,15 @@ Return ONLY a JSON array of 5 strings. No markdown. No preamble.`;
     document.getElementById('loadingRow').classList.remove('hidden');
 
     const storyCtx = userStory.length > 0 ? `Their background: ${userStory.join(', ')}.` : '';
-    const prompt = `You are a warm, honest interview coach helping ${userName} prepare for a ${userRole} role. ${storyCtx}
+    const prompt = `You are a sharp, modern interview coach helping ${userName} prepare for a ${userRole} role. ${storyCtx}
 
 Question: "${questions[currentQ]}"
 Answer: "${answer}"
 
+Analyze their delivery heavily. Explicitly call out if they use filler words ("um", "uh", "like"), sound nervous, or ramble. Give constructive coaching on confidence and clarity. Drastically vary your phrasing each time so it never sounds repetitive.
+
 Return ONLY this JSON (no markdown, no backticks):
-{"summary":"2-3 sentences of specific feedback referencing their actual words","strength":"one strong thing in 8 words max","improve":"one thing to sharpen in 8 words max","score":7}`;
+{"summary":"2-3 sentences of specific feedback heavily focused on delivery, nervousness, and filler words","strength":"one strong thing in 8 words max","improve":"one thing to sharpen in 8 words max","score":7}`;
 
     try {
       const res = await callClaude('You are a coach. Return only valid JSON.', [{ role: 'user', content: prompt }], 400);
